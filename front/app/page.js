@@ -1,12 +1,12 @@
 "use client"
 import styles from './page.module.css'
 import Layout from '@/components/Layout/Layout'
-import Voting from '@/components/Voting/Voting'
+import Body from '@/components/Body/Body'
 
 export default function Home() {
   return (
     <Layout>
-      <Voting />
+      <Body />
     </Layout>
   )
 }
