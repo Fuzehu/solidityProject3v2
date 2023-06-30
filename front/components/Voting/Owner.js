@@ -29,7 +29,7 @@ const Owner = () => {
 
     // STATES
     const [addVoter, setAddVoter] = useState(null)
-    const [whiteListEvent, setWhiteListEvent] = useState([])
+    const [whitelistEvent, setWhitelistEvent] = useState([])
 
     // CONTRACT ADDRESS
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
@@ -42,7 +42,7 @@ const Owner = () => {
                 address: contractAddress,
                 abi: Contract.abi,
                 functionName: "addVoter",
-                args: [voterAddress],
+                args: [addVoter],
             })
             await writeContract(request)
 
@@ -50,7 +50,7 @@ const Owner = () => {
 
             toast({
                 title: 'Success !',
-                description: `${voterAddress} has been successfully added to the voting whitelist`,
+                description: `${addVoter} has been successfully added to the voting whitelist`,
                 status: 'success',
                 duration: 3000,
                 isClosable: true,
@@ -67,8 +67,25 @@ const Owner = () => {
         }
 
 
+    }
+
+    // GET EVENTS
+    const getEvents = async () => {
+        //GET VOTER REGISTERED EVENT
+        const whitelistEvent = async () => {
+            event: parseAbiItem('event VoterRegistered(address indexed voterAddress)');
+            fromBlock: 0n;
+            toBlock: 'latest' // default value
+        }
+        /*setWhitelistEvent(whitelistEvent.map(
+            log => ({
+                address: log.args.account
+            })
+        ))*/
 
     }
+
+
 
     return (
         <div>
