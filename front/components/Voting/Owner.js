@@ -21,7 +21,7 @@ import { hardhat } from 'viem/chains'
 
 const Owner = () => {
 
-    // RECUP LES INFOS DU LOGGED WALLET 
+    // GET LOGGED WALLET INFO
     const { isConnected, address } = useAccount()
 
     // CHAKRA-UI TOAST 
@@ -29,6 +29,7 @@ const Owner = () => {
 
     // STATES
     const [addVoter, setAddVoter] = useState(null)
+    const [whiteListEvent, setWhiteListEvent] = useState([])
 
     // CONTRACT ADDRESS
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
@@ -72,13 +73,16 @@ const Owner = () => {
     return (
         <div>
             <Flex width="100%">
+                Owner has to be whitelisted in order to check who is whitelisted (getVoter has onlyVoter modifier)
+            </Flex>
+            <Flex width="100%">
             {isConnected ? (
                 <Flex direction="column" width="100%">
                     <Heading as='h2' size='xl'>
                         Add a voter address to the voting whitlist
                     </Heading>
                     <Flex mt="1rem">
-                        <Input  /*onChange={e => setAddVoter(e.target.value)}*//>
+                        <Input  placeholder='Enter address to whitelist'onChange={e => setAddVoter(e.target.value)}/>
                         <Button colorScheme='whatsapp' onClick={() => whitelist()}>Register Voter</Button>
                     </Flex>
             </Flex>
