@@ -52,6 +52,7 @@ const Owner = () => {
                 functionName: "addVoter",
                 args: [addVoter],
             })
+
             await writeContract(request)
 
             await getEvents()            
@@ -82,15 +83,15 @@ const Owner = () => {
                 address: contractAddress,
                 abi: Contract.abi,
                 functionName: "startProposalsRegistering",
-                //args: [addVoter],
             })
+
             await writeContract(request)
 
             await getEvents()            
 
             toast({
                 title: 'Success !',
-                description: `Resgistered voters can now send proposals`,
+                description: `Proposals Registration Started`,
                 status: 'success',
                 duration: 3000,
                 isClosable: true,
@@ -106,6 +107,103 @@ const Owner = () => {
             })
         }
     }
+
+    // END PROPOSAL REGISTERING FUNCTION
+    const endProposalsRegistering = async () => {
+        try {
+            const { request } = await prepareWriteContract({
+                address: contractAddress,
+                abi: Contract.abi,
+                functionName: "endProposalsRegistering",
+            })
+
+            await writeContract(request)
+
+            await getEvents()            
+
+            toast({
+                title: 'Success !',
+                description: `Proposals Registration Session Ended`,
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (err) {
+            console.log(err);
+            toast({
+                title: 'Error!',
+                description: 'An error occured.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            })
+        }
+    }
+
+    // START VOTING SESSSION FUNCTION
+    const startVotingSession = async () => {
+        try {
+            const { request } = await prepareWriteContract({
+                address: contractAddress,
+                abi: Contract.abi,
+                functionName: "startVotingSession",
+            })
+
+            await writeContract(request)
+
+            await getEvents()            
+
+            toast({
+                title: 'Success !',
+                description: `Voting Session Started`,
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (err) {
+            console.log(err);
+            toast({
+                title: 'Error!',
+                description: 'An error occured.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            })
+        }
+    }
+
+    // TALLY VOTES FUNCTION
+    const tallyVotes = async () => {
+        try {
+            const { request } = await prepareWriteContract({
+                address: contractAddress,
+                abi: Contract.abi,
+                functionName: "tallyVotes",
+            })
+
+            await writeContract(request)
+
+            await getEvents()            
+
+            toast({
+                title: 'Success !',
+                description: `Voting Session Ended, Votes are Tallied`,
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (err) {
+            console.log(err);
+            toast({
+                title: 'Error!',
+                description: 'An error occured.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            })
+        }
+    }
+
 
     // GET EVENTS
     const getEvents = async () => {
@@ -172,10 +270,31 @@ const Owner = () => {
             <Flex />
 
             <Heading as='h2' size='xl' mt="2rem">
-                Trigger 2nd workflow status by allowing registered voters to submit proposals for the voting session
+                2nd Workflow Status - Voters can suggest Proposals for the voting session
             </Heading>
             <Flex mt="1rem">
-                <Button colorScheme='whatsapp' onClick={() => startProposalsRegistering()}>Start Proposals Registering </Button>
+                <Button colorScheme='whatsapp' onClick={() => startProposalsRegistering()}>Start Proposals Registering</Button>
+            </Flex>
+
+            <Heading as='h2' size='xl' mt="2rem">
+                3rd Workflow Status - Voters can suggest Proposals for the voting session
+            </Heading>
+            <Flex mt="1rem">
+                <Button colorScheme='whatsapp' onClick={() => endProposalsRegistering()}>End Proposals Registering</Button>
+            </Flex>
+
+            <Heading as='h2' size='xl' mt="2rem">
+                4th Workflow Status - Voters can now vote for the Proposal of their choice
+            </Heading>
+            <Flex mt="1rem">
+                <Button colorScheme='whatsapp' onClick={() => startVotingSession()}>Start Voting Session</Button>
+            </Flex>
+
+            <Heading as='h2' size='xl' mt="2rem">
+                5th Workflow Status - Voters can now check the Winning Proposal
+            </Heading>
+            <Flex mt="1rem">
+                <Button colorScheme='whatsapp' onClick={() => tallyVotes()}>End Voting Session and Tally the Vote</Button>
             </Flex>
 </div>
     )
