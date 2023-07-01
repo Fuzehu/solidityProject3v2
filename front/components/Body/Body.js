@@ -41,11 +41,11 @@ const Body = () => {
         const owner = await contract.owner();
         console.log("Owner address:", owner);
         setIsOwner(owner === address) 
-      }
+    }
 
-      useEffect(() => {
+    useEffect(() => {
         getOwner()
-      }, []);
+    }, []);
 
     
     return (
@@ -56,12 +56,19 @@ const Body = () => {
                         <Flex width="100%">
                             <Flex direction="column" width="100%">
                                 <Heading as="h2" size="x1">
-                                    {
-                                        isConnected ? 
-                                            isOwner && ( <Owner/> )
-                                            ( isVoter ? ( <Voter/> ) : ( <NonRegisteredVoter/> ) )
-                                        : ( <NotConnected/> )
-                                    }
+                                {isConnected ? (
+                                    <>
+                                        {isOwner ? (
+                                        <Owner />
+                                        ) : isVoter ? (
+                                        <Voter />
+                                        ) : (
+                                        <NonRegisteredVoter />
+                                        )}
+                                    </>
+                                ) : (
+                                    <NotConnected />
+                                )}
                                 </Heading>
                             </Flex>
                         </Flex>
