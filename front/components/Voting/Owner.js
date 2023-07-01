@@ -131,7 +131,7 @@ const Owner = () => {
     return (
         <div>
             <Heading as='h2' size='xl' mt="2rem">
-                Current Status is 
+                Current Status is ...
             </Heading>
             
             <Flex width="100%">
