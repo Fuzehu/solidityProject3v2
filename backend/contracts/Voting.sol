@@ -244,7 +244,9 @@ contract Voting is Ownable {
 
         return winningProposalID;
     }
+
+    receive() external payable {} // to support receiving ETH by default
+    fallback() external payable {}
 }
 
 
-// Pour moi on pourrait passer directement de VotingSessionStarted à VotesTallied (VotingSessionEnded perdant tout son intérêt)

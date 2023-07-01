@@ -21,6 +21,12 @@ import { hardhat } from 'viem/chains'
 
 const Owner = () => {
 
+    // Create client for Viem
+    const client = createPublicClient({
+        chain: hardhat,
+        transport: http(),
+    })
+
     // GET LOGGED WALLET INFO
     const { isConnected, address } = useAccount()
 
@@ -72,19 +78,23 @@ const Owner = () => {
     // GET EVENTS
     const getEvents = async () => {
         //GET VOTER REGISTERED EVENT
-        const whitelistEvent = async () => {
-            event: parseAbiItem('event VoterRegistered(address indexed voterAddress)');
-            fromBlock: 0n;
+        const whitelistLogs = await client.getLogs({
+            event: parseAbiItem('event VoterRegistered(address voterAddress)'),
+            fromBlock: 0n,
             toBlock: 'latest' // default value
-        }
-        /*setWhitelistEvent(whitelistEvent.map(
+        })
+        console.log(whitelistLogs)
+        setWhitelistEvent(whitelistEvent.map(
             log => ({
                 address: log.args.account
             })
-        ))*/
-
+        ))
     }
 
+
+    useEffect(() => {
+        getEvents();
+      }, []);
 
 
     return (
@@ -107,10 +117,25 @@ const Owner = () => {
                 <Flex p="2rem" justifyContent="center" alignItems="center" width="100%">
                     <Text>Please connect your Wallet</Text>
                 </Flex>
-            )}
-            
-        </Flex>
-        </div>
+            )}  
+            </Flex>
+
+            <Heading as='h2' size='xl' mt="2rem">
+                Deposit Events
+            </Heading>
+
+            <Flex mt="1rem" direction="column"></Flex>
+                { whitelistEvent.length > 0 ? whitelistEvent.map((event) => {
+                    return <Flex key={uuidv4()}>
+                            <Text>
+                                {event.account}
+                            </Text>
+                        </Flex>
+                }) : (
+                    <Text>No Deposit Events</Text>
+                )}
+            <Flex />
+</div>
     )
 }
 
