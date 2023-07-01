@@ -10,7 +10,7 @@ import Ownable from '../../public/artifacts/@openzeppelin/contracts/access/Ownab
 
 //import { ethers } from "ethers"
 
-const NonResgisteredVoter = () => {
+const NonRegisteredVoter = () => {
 
     // STATES
 
@@ -25,4 +25,4 @@ const NonResgisteredVoter = () => {
     )
 }
 
-export default NonResgisteredVoter
+export default NonRegisteredVoter

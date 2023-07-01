@@ -2,6 +2,8 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 
+import { v4 as uuidv4 } from 'uuid';
+
 // CHAKRA-UI
 import { Heading, Flex, Text, Input, Button, useToast } from '@chakra-ui/react'
 
@@ -21,7 +23,7 @@ import { hardhat } from 'viem/chains'
 
 const Owner = () => {
 
-    // Create client for Viem
+    // CREATE VIEM CLIENT
     const client = createPublicClient({
         chain: hardhat,
         transport: http(),
@@ -71,8 +73,38 @@ const Owner = () => {
                 isClosable: true,
             })
         }
+    }
 
+    // START PROPOSAL REGISTERING FUNCTION
+    const startProposalsRegistering = async () => {
+        try {
+            const { request } = await prepareWriteContract({
+                address: contractAddress,
+                abi: Contract.abi,
+                functionName: "startProposalsRegistering",
+                //args: [addVoter],
+            })
+            await writeContract(request)
 
+            await getEvents()            
+
+            toast({
+                title: 'Success !',
+                description: `Resgistered voters can now send proposals`,
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (err) {
+            console.log(err);
+            toast({
+                title: 'Error!',
+                description: 'An error occured.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            })
+        }
     }
 
     // GET EVENTS
@@ -83,10 +115,9 @@ const Owner = () => {
             fromBlock: 0n,
             toBlock: 'latest' // default value
         })
-        console.log(whitelistLogs)
-        setWhitelistEvent(whitelistEvent.map(
+        setWhitelistEvent(whitelistLogs.map(
             log => ({
-                address: log.args.account
+                address: log.args.voterAddress
             })
         ))
     }
@@ -99,6 +130,10 @@ const Owner = () => {
 
     return (
         <div>
+            <Heading as='h2' size='xl' mt="2rem">
+                Current Status is 
+            </Heading>
+            
             <Flex width="100%">
                 Owner has to be whitelisted in order to check who is whitelisted (getVoter has onlyVoter modifier)
             </Flex>
@@ -106,7 +141,7 @@ const Owner = () => {
             {isConnected ? (
                 <Flex direction="column" width="100%">
                     <Heading as='h2' size='xl'>
-                        Add a voter address to the voting whitlist
+                        Add a voter address to the voting whitelist
                     </Heading>
                     <Flex mt="1rem">
                         <Input  placeholder='Enter address to whitelist'onChange={e => setAddVoter(e.target.value)}/>
@@ -121,20 +156,27 @@ const Owner = () => {
             </Flex>
 
             <Heading as='h2' size='xl' mt="2rem">
-                Deposit Events
+                Whitelist Events
             </Heading>
 
             <Flex mt="1rem" direction="column"></Flex>
                 { whitelistEvent.length > 0 ? whitelistEvent.map((event) => {
                     return <Flex key={uuidv4()}>
                             <Text>
-                                {event.account}
+                                {event.address}
                             </Text>
                         </Flex>
                 }) : (
-                    <Text>No Deposit Events</Text>
+                    <Text>No Address Whitelisted to this date</Text>
                 )}
             <Flex />
+
+            <Heading as='h2' size='xl' mt="2rem">
+                Trigger 2nd workflow status by allowing registered voters to submit proposals for the voting session
+            </Heading>
+            <Flex mt="1rem">
+                <Button colorScheme='whatsapp' onClick={() => startProposalsRegistering()}>Start Proposals Registering </Button>
+            </Flex>
 </div>
     )
 }
