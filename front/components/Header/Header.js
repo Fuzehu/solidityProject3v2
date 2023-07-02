@@ -9,7 +9,7 @@ const Header = () => {
         alignItems="center"
         p="2rem"
     >
-        <Text>Logo</Text>
+        <Text>DAPP Voting</Text>
         <ConnectButton />
     </Flex>
   )

@@ -20,6 +20,7 @@ const Body = () => {
 
     // STATES
     const [isOwner, setIsOwner] = useState(null)
+    const [isVoter, setIsVoter] = useState(null)
 
     // CONTRACT ADDRESS
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS

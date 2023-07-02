@@ -20,6 +20,8 @@ import { useAccount } from 'wagmi'
 import { createPublicClient, http, parseAbiItem } from 'viem'
 import { hardhat } from 'viem/chains'
 
+import Header from '../Header/Header'
+
 
 const Owner = () => {
 
@@ -38,9 +40,20 @@ const Owner = () => {
     // STATES
     const [addVoter, setAddVoter] = useState(null)
     const [whitelistEvent, setWhitelistEvent] = useState([])
+    const [previousStatus, setPreviousStatus] = useState(null)
+    const [newStatus, setNewStatus] = useState(0)
 
     // CONTRACT ADDRESS
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
+
+    // ENUM NAME STATUS
+    const nameWorkflowStatus = [
+            'RegisteringVoters',
+            'ProposalsRegistrationStarted',
+            'ProposalsRegistrationEnded',
+            'VotingSessionStarted',
+            'VotesTallied'
+        ]
 
 
     // ADDVOTER FUNCTION
@@ -55,7 +68,7 @@ const Owner = () => {
 
             await writeContract(request)
 
-            await getEvents()            
+            await getWhitelistLogs()            
 
             toast({
                 title: 'Success !',
@@ -87,7 +100,7 @@ const Owner = () => {
 
             await writeContract(request)
 
-            await getEvents()            
+            await getWorkflowStatusLogs()            
 
             toast({
                 title: 'Success !',
@@ -119,7 +132,7 @@ const Owner = () => {
 
             await writeContract(request)
 
-            await getEvents()            
+            await getWorkflowStatusLogs()            
 
             toast({
                 title: 'Success !',
@@ -151,7 +164,7 @@ const Owner = () => {
 
             await writeContract(request)
 
-            await getEvents()            
+            await getWorkflowStatusLogs()            
 
             toast({
                 title: 'Success !',
@@ -183,7 +196,7 @@ const Owner = () => {
 
             await writeContract(request)
 
-            await getEvents()            
+            await getWorkflowStatusLogs()            
 
             toast({
                 title: 'Success !',
@@ -205,9 +218,9 @@ const Owner = () => {
     }
 
 
-    // GET EVENTS
-    const getEvents = async () => {
-        //GET VOTER REGISTERED EVENT
+
+    //GET VOTER REGISTERED EVENT
+    const getWhitelistLogs = async () => {
         const whitelistLogs = await client.getLogs({
             event: parseAbiItem('event VoterRegistered(address voterAddress)'),
             fromBlock: 0n,
@@ -220,21 +233,41 @@ const Owner = () => {
         ))
     }
 
+    // //GET WORKFLOW STATUS CHANGE EVENT
+    const getWorkflowStatusLogs = async () => {
+        const workflowStatusLogs = await client.getLogs({
+            event: parseAbiItem('event WorkflowStatusChange(uint8 previousStatus, uint8 newStatus)'),
+            fromBlock: 0n,
+            toBlock: 'latest' // default value
+        })
+        try {
+            setPreviousStatus(workflowStatusLogs[workflowStatusLogs.length - 1].args.previousStatus)
+            setNewStatus(workflowStatusLogs[workflowStatusLogs.length - 1].args.newStatus)
+        } catch {}
+    }
+
+
 
     useEffect(() => {
-        getEvents();
-      }, []);
+        getWhitelistLogs()
+        getWorkflowStatusLogs()
+    }, []);
+
+
 
 
     return (
         <div>
+            <Header/>
+            { (previousStatus != null ) && 
+                <Heading as='h2' size='xl' mt="2rem">
+                    Previous Status was {nameWorkflowStatus[previousStatus]}
+                </Heading>
+            }
             <Heading as='h2' size='xl' mt="2rem">
-                Current Status is ...
+                Current Status is {nameWorkflowStatus[newStatus]}
             </Heading>
             
-            <Flex width="100%">
-                Owner has to be whitelisted in order to check who is whitelisted (getVoter has onlyVoter modifier)
-            </Flex>
             <Flex width="100%">
             {isConnected ? (
                 <Flex direction="column" width="100%">
@@ -254,7 +287,7 @@ const Owner = () => {
             </Flex>
 
             <Heading as='h2' size='xl' mt="2rem">
-                Whitelist Events
+                Whitelisted Voter Addresses (Events)
             </Heading>
 
             <Flex mt="1rem" direction="column"></Flex>
@@ -269,33 +302,50 @@ const Owner = () => {
                 )}
             <Flex />
 
-            <Heading as='h2' size='xl' mt="2rem">
-                2nd Workflow Status - Voters can suggest Proposals for the voting session
-            </Heading>
-            <Flex mt="1rem">
-                <Button colorScheme='whatsapp' onClick={() => startProposalsRegistering()}>Start Proposals Registering</Button>
-            </Flex>
-
-            <Heading as='h2' size='xl' mt="2rem">
-                3rd Workflow Status - Voters can suggest Proposals for the voting session
-            </Heading>
-            <Flex mt="1rem">
-                <Button colorScheme='whatsapp' onClick={() => endProposalsRegistering()}>End Proposals Registering</Button>
-            </Flex>
-
-            <Heading as='h2' size='xl' mt="2rem">
-                4th Workflow Status - Voters can now vote for the Proposal of their choice
-            </Heading>
-            <Flex mt="1rem">
-                <Button colorScheme='whatsapp' onClick={() => startVotingSession()}>Start Voting Session</Button>
-            </Flex>
-
-            <Heading as='h2' size='xl' mt="2rem">
-                5th Workflow Status - Voters can now check the Winning Proposal
-            </Heading>
-            <Flex mt="1rem">
-                <Button colorScheme='whatsapp' onClick={() => tallyVotes()}>End Voting Session and Tally the Vote</Button>
-            </Flex>
+            {
+                () => {
+                    switch (newStatus) {
+                        case 0:
+                            return <>
+                                    <Heading as='h2' size='xl' mt="2rem">
+                                        2nd Workflow Status - Voters can suggest Proposals for the voting session
+                                    </Heading>
+                                    <Flex mt="1rem">
+                                        <Button colorScheme='whatsapp' onClick={() => startProposalsRegistering()}>Start Proposals Registering</Button>
+                                    </Flex>
+                                </>
+                        case 1:
+                            return <>
+                                    <Heading as='h2' size='xl' mt="2rem">
+                                        3rd Workflow Status - Voters can suggest Proposals for the voting session
+                                    </Heading>
+                                    <Flex mt="1rem">
+                                        <Button colorScheme='whatsapp' onClick={() => endProposalsRegistering()}>End Proposals Registering</Button>
+                                    </Flex>
+                                </>
+                        case 2:
+                            return <>
+                                    <Heading as='h2' size='xl' mt="2rem">
+                                        4th Workflow Status - Voters can now vote for the Proposal of their choice
+                                    </Heading>
+                                    <Flex mt="1rem">
+                                        <Button colorScheme='whatsapp' onClick={() => startVotingSession()}>Start Voting Session</Button>
+                                    </Flex>
+                                </>
+                        case 3:
+                            return <>
+                                    <Heading as='h2' size='xl' mt="2rem">
+                                        5th Workflow Status - Voters can now check the Winning Proposal
+                                    </Heading>
+                                    <Flex mt="1rem">
+                                        <Button colorScheme='whatsapp' onClick={() => tallyVotes()}>End Voting Session and Tally the Vote</Button>
+                                    </Flex>
+                                </>
+                        default:
+                            break
+                    }
+                }
+            }
 </div>
     )
 }

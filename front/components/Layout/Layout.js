@@ -4,7 +4,7 @@ import Footer from '../Footer/Footer'
 import Body from '../Body/Body'
 import { Flex } from '@chakra-ui/react'
 
-const Layout = ({ children }) => {
+const Layout = () => {
   return (
     <Flex
       direction="column"
@@ -16,7 +16,7 @@ const Layout = ({ children }) => {
           grow="1"
           p="2rem"
         >
-          {children}
+          <Body />
         </Flex>
         <Footer />
     </Flex>

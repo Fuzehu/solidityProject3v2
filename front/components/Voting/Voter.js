@@ -40,6 +40,8 @@ const Voter = () => {
     // STATES
     const [addProposal, setAddProposal] = useState(null)
     const [setVote, setSetVote] = useState([])
+    const [voterEvent, setVoterEvent] = useState([])
+    const [votedProposalIDEvent, setVotedProposalIDEvent] = useState([])
 
     // ADDPROPOSAL FUNCTION
     const Proposal = async () => {
@@ -74,37 +76,66 @@ const Voter = () => {
     }
 
 
-        // ADDPROPOSAL FUNCTION
-        const Vote = async () => {
-            try {
-                const { request } = await prepareWriteContract({
-                    address: contractAddress,
-                    abi: Contract.abi,
-                    functionName: "setVote",
-                    args: [setVote],
-                })
-                await writeContract(request)
-    
-                await getEvents()            
-    
-                toast({
-                    title: 'Success !',
-                    description: `Your vote for the ${setVote} proposal has been successfully registered`,
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                })
-            } catch (err) {
-                console.log(err);
-                toast({
-                    title: 'Error!',
-                    description: 'An error occured.',
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                })
-            }
+    // ADDPROPOSAL FUNCTION
+    const Vote = async () => {
+        try {
+            const { request } = await prepareWriteContract({
+                address: contractAddress,
+                abi: Contract.abi,
+                functionName: "setVote",
+                args: [setVote],
+            })
+            await writeContract(request)
+
+            await getEvents()            
+
+            toast({
+                title: 'Success !',
+                description: `Your vote for the ${setVote} proposal has been successfully registered`,
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (err) {
+            console.log(err);
+            toast({
+                title: 'Error!',
+                description: 'An error occured.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            })
         }
+    }
+
+
+    //GET PROPOSAL REGISTERED EVENT
+    const getProposalRegisteredLogs = async () => {
+        const ProposalRegisteredLogs = await client.getLogs({
+            event: parseAbiItem('event ProposalRegistered(uint proposalId)'),
+            fromBlock: 0n,
+            toBlock: 'latest' // default value
+        })
+        setSetVote(ProposalRegisteredLogs.map(
+            log => ({
+                addedProposal: log.args.proposalId
+            })
+        ))
+    }
+
+    // //GET VOTED EVENT
+    const getVotedLogs = async () => {
+        const VotedLogs = await client.getLogs({
+            event: parseAbiItem('event Voted(address indexed voterEvent, uint votedProposalIDEvent)'),
+            fromBlock: 0n,
+            toBlock: 'latest' // default value
+        })
+        try {
+            setVoterEvent(VotedLogs.map[voterEvent]) // pas un map mais afficher le vote du voter sur son écran?
+            setVotedProposalIDEvent(VotedLogs.map[votedProposalIDEvent]) // pas un map mais afficher le vote du voter sur son écran?
+        } catch {}
+    }
+
 
     return (
         <div>
