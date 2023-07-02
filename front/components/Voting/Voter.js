@@ -59,6 +59,9 @@ const Voter = () => {
         'VotesTallied'
     ]
 
+    // ::::::::::::: FUNCTION ::::::::::::: // 
+
+
     // ADDPROPOSAL FUNCTION
     const Proposal = async () => {
         try {
@@ -91,7 +94,6 @@ const Voter = () => {
         }
     };
 
-//////////////////////////////////////////////////////////////////////////////////////
 
     // GET ONE PROPOSAL 
     const getOneProposal = async () => {
@@ -113,7 +115,7 @@ const Voter = () => {
             title: 'Success!',
             description: description,
             status: 'success',
-            duration: 3000,
+            duration: 5000,
             isClosable: true,
           });
 
@@ -129,9 +131,6 @@ const Voter = () => {
         }
       };
 
-//////////////////////////////////////////////////////////////////////////////////////
-
-
 
     // SET VOTE FUNCTION
     const Vote = async () => {
@@ -144,11 +143,11 @@ const Voter = () => {
         });
         await writeContract(request);
 
-        await getEvents();
+        await getVotedLogs();
 
         toast({
             title: 'Success !',
-            description: `Your vote for the ${setVote} proposal has been successfully registered`,
+            description: `Your vote has been successfully registered`,
             status: 'success',
             duration: 3000,
             isClosable: true,
@@ -165,9 +164,9 @@ const Voter = () => {
         }
     };
 
-                        ////////////////
-                //////////// EVENTS ////////////
-                        ////////////////
+
+    // ::::::::::::: EVENTS ::::::::::::: // 
+
 
     // GET WHITELISTED USERS EVENT
     const getWhitelistLogs = async () => {
@@ -205,7 +204,7 @@ const Voter = () => {
     // GET VOTED EVENT
     const getVotedLogs = async () => {
         const votedLogs = await client.getLogs({
-            event: parseAbiItem('event Voted(address indexed voterEvent, uint votedProposalIDEvent)'),
+            event: parseAbiItem('event Voted(address voterEvent, uint votedProposalIDEvent)'),
             fromBlock: 0n,
             toBlock: 'latest',
         });
@@ -221,10 +220,14 @@ const Voter = () => {
         await getProposalRegisteredLogs();
     };
 
-    // Call getEvents when component mounts
+    // CALL ALL EVENTS WHEN COMPONENTS MOUNT
     useEffect(() => {
         getEvents();
     }, []);
+
+
+    // ::::::::::::: RENDER ::::::::::::: // 
+
 
     return (
         <div>
@@ -236,6 +239,7 @@ const Voter = () => {
             <Heading as='h2' size='xl' mt="2rem">
                 Current Status is {nameWorkflowStatus[newStatus]}
             </Heading>
+
 
             <Flex width="100%">
                 <Flex direction="column" width="100%">
@@ -250,10 +254,10 @@ const Voter = () => {
                 </Flex>
             </Flex>
 
+
             <Heading as='h2' size='xl' mt="2rem">
                 Proposals added to the voting session (Events)
             </Heading>
-
             <Flex mt="1rem" direction="column"></Flex>
                 { addProposalEvent.length > 0 ? addProposalEvent.map((event) => {
                     return <Flex key={uuidv4()}>
@@ -266,11 +270,25 @@ const Voter = () => {
                 )}
             <Flex />
 
+
             <Flex mt="1rem">
             <Input  placeholder='Enter a given proposal ID'onChange={e => SetGetProposal(e.target.value)}/>
-            <Button colorScheme='whatsapp' onClick={() => getOneProposal()}>Get Proposal from ID</Button>
+            <Button colorScheme='whatsapp' onClick={() => getOneProposal()}>Get Proposal name from ID</Button>
             </Flex>
 
+
+            <Flex width="100%">
+                <Flex direction="column" width="100%">
+                    <Heading as='h2' size='xl'>
+                        Choose the proposal that you want to vote
+                    </Heading>
+                    <Flex mt="1rem">
+                        <Input  placeholder='Enter a proposal'onChange={e => setAddProposal(e.target.value)}/>
+                        <Button colorScheme='whatsapp' onClick={() => Vote()}>Vote</Button>
+            
+                    </Flex>
+                </Flex>
+            </Flex>
         </div>
     );
 };
