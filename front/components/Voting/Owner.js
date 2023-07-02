@@ -2,6 +2,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 
+// RANDOMIZER
 import { v4 as uuidv4 } from 'uuid';
 
 // CHAKRA-UI
@@ -19,8 +20,6 @@ import { useAccount } from 'wagmi'
 // VIEM (events)
 import { createPublicClient, http, parseAbiItem } from 'viem'
 import { hardhat } from 'viem/chains'
-
-import Header from '../Header/Header'
 
 
 const Owner = () => {
@@ -42,6 +41,7 @@ const Owner = () => {
     const [whitelistEvent, setWhitelistEvent] = useState([])
     const [previousStatus, setPreviousStatus] = useState(null)
     const [newStatus, setNewStatus] = useState(0)
+    
 
     // CONTRACT ADDRESS
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
@@ -258,7 +258,6 @@ const Owner = () => {
 
     return (
         <div>
-            <Header/>
             { (previousStatus != null ) && 
                 <Heading as='h2' size='xl' mt="2rem">
                     Previous Status was {nameWorkflowStatus[previousStatus]}
@@ -298,15 +297,11 @@ const Owner = () => {
                             </Text>
                         </Flex>
                 }) : (
-                    <Text>No Address Whitelisted to this date</Text>
+                    <Text>No Address Whitelisted to this stage</Text>
                 )}
             <Flex />
 
-            {
-                () => {
-                    switch (newStatus) {
-                        case 0:
-                            return <>
+            { newStatus == 0 && <>
                                     <Heading as='h2' size='xl' mt="2rem">
                                         2nd Workflow Status - Voters can suggest Proposals for the voting session
                                     </Heading>
@@ -314,8 +309,9 @@ const Owner = () => {
                                         <Button colorScheme='whatsapp' onClick={() => startProposalsRegistering()}>Start Proposals Registering</Button>
                                     </Flex>
                                 </>
-                        case 1:
-                            return <>
+            }           
+                        
+            { newStatus == 1 && <>
                                     <Heading as='h2' size='xl' mt="2rem">
                                         3rd Workflow Status - Voters can suggest Proposals for the voting session
                                     </Heading>
@@ -323,8 +319,9 @@ const Owner = () => {
                                         <Button colorScheme='whatsapp' onClick={() => endProposalsRegistering()}>End Proposals Registering</Button>
                                     </Flex>
                                 </>
-                        case 2:
-                            return <>
+            }           
+                        
+            { newStatus == 2 && <>
                                     <Heading as='h2' size='xl' mt="2rem">
                                         4th Workflow Status - Voters can now vote for the Proposal of their choice
                                     </Heading>
@@ -332,8 +329,9 @@ const Owner = () => {
                                         <Button colorScheme='whatsapp' onClick={() => startVotingSession()}>Start Voting Session</Button>
                                     </Flex>
                                 </>
-                        case 3:
-                            return <>
+            }           
+                        
+            { newStatus == 3 && <>
                                     <Heading as='h2' size='xl' mt="2rem">
                                         5th Workflow Status - Voters can now check the Winning Proposal
                                     </Heading>
@@ -341,12 +339,9 @@ const Owner = () => {
                                         <Button colorScheme='whatsapp' onClick={() => tallyVotes()}>End Voting Session and Tally the Vote</Button>
                                     </Flex>
                                 </>
-                        default:
-                            break
-                    }
-                }
-            }
-</div>
+            }   
+
+        </div>
     )
 }
 

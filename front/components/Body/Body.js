@@ -34,7 +34,6 @@ const Body = () => {
             const provider = new JsonRpcProvider("http://localhost:8545");
             const contract = new ethers.Contract(contractAddress, Contract.abi, provider);
             const owner = await contract.owner();
-            console.log("Owner address:", owner);
             setIsOwner(owner === address)
         }
 
