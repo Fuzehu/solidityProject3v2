@@ -41,6 +41,8 @@ const Owner = () => {
     const [whitelistEvent, setWhitelistEvent] = useState([])
     const [previousStatus, setPreviousStatus] = useState(null)
     const [newStatus, setNewStatus] = useState(0)
+    const [winningProposalId, setWinningProposalId] = useState([]);
+
     
 
     // CONTRACT ADDRESS
@@ -218,6 +220,36 @@ const Owner = () => {
     }
 
 
+    const getWinningProposalId = async () => {
+        try {
+        const { request } = await prepareWriteContract({
+            address: contractAddress,
+            abi: Contract.abi,
+            functionName: 'winningProposalID',
+        });
+        const winningProposalId = await readContract(request);
+
+        setWinningProposalId(winningProposalId.toString())
+        console.log(winningProposalId)
+
+        toast({
+            title: 'Success !',
+            description: `The winning proposal ID is ${winningProposalId}`,
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        });
+        } catch (err) {
+        console.log(err);
+        toast({
+            title: 'Error!',
+            description: 'An error occurred.',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+        });
+        }
+    };
 
     //GET VOTER REGISTERED EVENT
     const getWhitelistLogs = async () => {
@@ -341,6 +373,15 @@ const Owner = () => {
                                 </>
             }   
 
+
+                                <Flex width="100%">
+                                    <Flex direction="column" width="100%">
+                                        <Button colorScheme='whatsapp' onClick={() => getWinningProposalId()}>Get the Winning Proposal ID</Button>
+                                        <Heading as='h2' size='xl'>
+                                            The Voting Session has now ended and the Winning Proposal has the ID number {winningProposalId}
+                                        </Heading>
+                                    </Flex>
+                                </Flex>
         </div>
     )
 }

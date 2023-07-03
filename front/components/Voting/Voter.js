@@ -42,13 +42,19 @@ const Voter = () => {
 
     const [addProposal, setAddProposal] = useState(null);
     const [addProposalEvent, setAddProposalEvent] = useState([]);
-    const [getProposal, SetGetProposal] = useState(null);
+
+    const [getProposal, setGetProposal] = useState('');
     const [description, setDescription] = useState('');
     const [voteCount, setVoteCount] = useState(0);
 
-    const [setVote, setSetVote] = useState([]);
+    //const [proposalsList, setProposalsList] = useState([]);
+    //const [proposalNumber, setProposalNumber] = useState(0);
+
+    const [vote, setVote] = useState(0);
     const [voterEvent, setVoterEvent] = useState([]);
-    const [votedProposalIDEvent, setVotedProposalIDEvent] = useState([]);
+    const [votedProposalIDEvent, setVotedProposalIDEvent] = useState('');
+
+    const [winningProposalId, setWinningProposalId] = useState([]);
 
     // ENUM NAME STATUS
     const nameWorkflowStatus = [
@@ -79,7 +85,7 @@ const Voter = () => {
             title: 'Success !',
             description: `${addProposal} has been successfully added as proposal to the voting session`,
             status: 'success',
-            duration: 3000,
+            duration: 5000,
             isClosable: true,
         });
         } catch (err) {
@@ -102,14 +108,14 @@ const Voter = () => {
                 address: contractAddress,
                 abi: Contract.abi,
                 functionName: "getOneProposal",
-                args: [getProposal],
+                args: [getProposal,],
           });
       
           const result = await readContract(request);
           const { description, voteCount } = result; // Extraction des paramètres de l'objet retourné
       
           setDescription(description);
-          setVoteCount(voteCount);
+          setVoteCount(voteCount)
       
           toast({
             title: 'Success!',
@@ -139,7 +145,7 @@ const Voter = () => {
             address: contractAddress,
             abi: Contract.abi,
             functionName: 'setVote',
-            args: [setVote],
+            args: [vote],
         });
         await writeContract(request);
 
@@ -147,7 +153,7 @@ const Voter = () => {
 
         toast({
             title: 'Success !',
-            description: `Your vote has been successfully registered`,
+            description: `Your vote for the Proposal ID ${vote} has been successfully registered`,
             status: 'success',
             duration: 3000,
             isClosable: true,
@@ -164,6 +170,77 @@ const Voter = () => {
         }
     };
 
+    /*const getWinningProposalId = async () => {
+        const winningProposalId = await Contract.abi.read.winningProposalID();
+        setWinningProposalId(winningProposalId.toString())
+    }*/
+
+    const getWinningProposalId = async () => {
+        try {
+        const { request } = await prepareWriteContract({
+            address: contractAddress,
+            abi: Contract.abi,
+            functionName: 'winningProposalID',
+        });
+        const winningProposalId = await readContract(request);
+
+        setWinningProposalId(winningProposalId.toString())
+        console.log(winningProposalId)
+
+        toast({
+            title: 'Success !',
+            description: `The winning proposal ID is ${winningProposalId}`,
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        });
+        } catch (err) {
+        console.log(err);
+        toast({
+            title: 'Error!',
+            description: 'An error occurred.',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+        });
+        }
+    };
+
+
+    // GET ONE PROPOSALVOTECOUNT
+    const getOneProposalVoteCount = async () => {
+        try {
+            const { request } = await prepareWriteContract({
+                address: contractAddress,
+                abi: Contract.abi,
+                functionName: "getOneProposal",
+                args: [getProposal],
+            })
+
+            const result = await readContract(request)
+            const { description, voteCount } = result; // Extraction des paramètres de l'objet retourné
+      
+            setDescription(description);
+            setVoteCount(voteCount)
+
+            toast({
+                title: 'Success !',
+                description: `Vote Count is ${voteCount}`,
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (err) {
+            console.log(err);
+            toast({
+                title: 'Error!',
+                description: 'An error occured.',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            })
+        }
+    }
 
     // ::::::::::::: EVENTS ::::::::::::: // 
 
@@ -223,6 +300,7 @@ const Voter = () => {
     // CALL ALL EVENTS WHEN COMPONENTS MOUNT
     useEffect(() => {
         getEvents();
+        
     }, []);
 
 
@@ -247,48 +325,97 @@ const Voter = () => {
                         Add a proposal to the voting session
                     </Heading>
                     <Flex mt="1rem">
-                        <Input  placeholder='Enter a proposal'onChange={e => setAddProposal(e.target.value)}/>
+                        <Input  placeholder='Enter the proposal you want to submit to the voting session'onChange={e => setAddProposal(e.target.value)}/>
                         <Button colorScheme='whatsapp' onClick={() => Proposal()}>Register Proposal</Button>
-            
                     </Flex>
                 </Flex>
             </Flex>
 
-
-            <Heading as='h2' size='xl' mt="2rem">
-                Proposals added to the voting session (Events)
-            </Heading>
-            <Flex mt="1rem" direction="column"></Flex>
-                { addProposalEvent.length > 0 ? addProposalEvent.map((event) => {
-                    return <Flex key={uuidv4()}>
-                            <Text>
-                                {event.id.toString()}
-                            </Text>
+            
+            <Flex direction="column">
+                <Heading as='h2' size='xl' mt="2rem">
+                    Proposals added to the voting session (Events)
+                </Heading>
+                <Flex mt="1rem" direction="column"></Flex>
+                    { addProposalEvent.length > 0 ? addProposalEvent.map((event) => {
+                        return <Flex key={uuidv4()}>
+                                <Text>
+                                    {event.id.toString()}
+                                </Text>
                         </Flex>
-                }) : (
-                    <Text>No Proposals added at this stage</Text>
-                )}
-            <Flex />
+                    }) : (
+                        <Text>No Proposals added at this stage</Text>
+                    )}
+                <Flex />
+            </Flex>
 
 
             <Flex mt="1rem">
-            <Input  placeholder='Enter a given proposal ID'onChange={e => SetGetProposal(e.target.value)}/>
-            <Button colorScheme='whatsapp' onClick={() => getOneProposal()}>Get Proposal name from ID</Button>
+                <Input  placeholder='Enter a valid specific proposal ID'onChange={e => setGetProposal(e.target.value)}/>
+                <Button colorScheme='whatsapp' onClick={() => getOneProposal()}>Get Proposal name from ID</Button>
             </Flex>
 
 
             <Flex width="100%">
                 <Flex direction="column" width="100%">
                     <Heading as='h2' size='xl'>
-                        Choose the proposal that you want to vote
+                        Choose the proposal that you want to vote for
                     </Heading>
                     <Flex mt="1rem">
-                        <Input  placeholder='Enter a proposal'onChange={e => setAddProposal(e.target.value)}/>
+                        <Input  placeholder='Enter the proposal ID of your choice'onChange={e => setVote(e.target.value)}/>
                         <Button colorScheme='whatsapp' onClick={() => Vote()}>Vote</Button>
             
                     </Flex>
                 </Flex>
             </Flex>
+
+
+            <Flex direction="column">
+                <Heading as='h2' size='xl' mt="2rem" direction="column">
+                    Vote logs : display the voted proposal of a specific voter address
+                </Heading>
+                <Flex mt="1rem" direction="column">
+                    {voterEvent.length > 0 && votedProposalIDEvent.length > 0 ? (
+                        <React.Fragment>
+                            {voterEvent.map((addr) => (
+                                <Flex key={uuidv4()}>
+                                    <Text>
+                                        Voter {addr.voterEvent} voted proposal ID number
+                                    </Text>
+                                </Flex>
+                            ))}
+                            {votedProposalIDEvent.map((id) => (
+                                <Flex key={uuidv4()}>
+                                    <Text>
+                                        Voted proposal ID number {id.votedProposalIDEvent}
+                                    </Text>
+                                </Flex>
+                            ))}
+                        </React.Fragment>
+                    ) : (
+                        <Text>No Vote completed at this stage</Text>
+                    )}
+                </Flex>
+            </Flex>
+
+
+            <Flex width="100%">
+                <Flex direction="column" width="100%">
+                    <Button colorScheme='whatsapp' onClick={() => getWinningProposalId()}>Get the Winning Proposal ID</Button>
+                    <Heading as='h2' size='xl'>
+                        The Voting Session has now ended and the Winning Proposal ID is {winningProposalId}
+                    </Heading>
+                </Flex>
+            </Flex>
+
+            <Flex mt="1rem">
+                <Input  placeholder='Enter a valid specific proposal ID'onChange={e => setGetProposal(e.target.value)}/>
+                <Button colorScheme='whatsapp' onClick={() => getOneProposalVoteCount()}>Get Proposal vote count from ID</Button>
+            </Flex>
+
+
+
+
         </div>
     );
 };
