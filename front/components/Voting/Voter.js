@@ -10,7 +10,6 @@ import { Heading, Flex, Text, Input, Button, useToast } from '@chakra-ui/react';
 
 // CONTRACT
 import Contract from '../../public/artifacts/contracts/Voting.sol/Voting.json';
-import Ownable from '../../public/artifacts/@openzeppelin/contracts/access/Ownable.sol/Ownable.json';
 import { ethers } from 'ethers';
 
 // WAGMI
@@ -52,7 +51,7 @@ const Voter = () => {
 
     const [vote, setVote] = useState(0);
     const [voterEvent, setVoterEvent] = useState([]);
-    const [votedProposalIDEvent, setVotedProposalIDEvent] = useState('');
+    const [votedProposalIDEvent, setVotedProposalIDEvent] = useState([]);
 
     const [winningProposalId, setWinningProposalId] = useState([]);
 
@@ -118,8 +117,7 @@ const Voter = () => {
           setVoteCount(voteCount)
       
           toast({
-            title: 'Success!',
-            description: description,
+            title: `The corresponding proposal is : ${description}`,
             status: 'success',
             duration: 5000,
             isClosable: true,
@@ -188,8 +186,7 @@ const Voter = () => {
         console.log(winningProposalId)
 
         toast({
-            title: 'Success !',
-            description: `The winning proposal ID is ${winningProposalId}`,
+            title: `The winning proposal ID is : ${winningProposalId}`,
             status: 'success',
             duration: 3000,
             isClosable: true,
@@ -218,16 +215,15 @@ const Voter = () => {
             })
 
             const result = await readContract(request)
-            const { description, voteCount } = result; // Extraction des paramètres de l'objet retourné
+            const { description, voteCount } = result; 
       
             setDescription(description);
             setVoteCount(voteCount)
 
             toast({
-                title: 'Success !',
-                description: `Vote Count is ${voteCount}`,
+                title: `The Vote Count for this proposal is : ${voteCount}`,
                 status: 'success',
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
             })
         } catch (err) {
@@ -242,8 +238,8 @@ const Voter = () => {
         }
     }
 
-    // ::::::::::::: EVENTS ::::::::::::: // 
 
+    // ::::::::::::: EVENTS ::::::::::::: // 
 
     // GET WHITELISTED USERS EVENT
     const getWhitelistLogs = async () => {
@@ -286,21 +282,21 @@ const Voter = () => {
             toBlock: 'latest',
         });
         setVoterEvent(votedLogs.map(log => ({voterEvent: log.args.voterEvent})));
-        setVotedProposalIDEvent(votedLogs.map(log => ({votedProposalIDEvent: log.args.votedProposalIDEvent})));
+        setVotedProposalIDEvent(votedLogs.map(log => ({votedProposalIDEvent: log.args.votedProposalIDEvent.toString()})));
     };
+
 
     // GET EVENTS
     const getEvents = async () => {
         await getWhitelistLogs();
         await getWorkflowStatusLogs();
-        await getVotedLogs();
         await getProposalRegisteredLogs();
+        await getVotedLogs();
     };
 
     // CALL ALL EVENTS WHEN COMPONENTS MOUNT
     useEffect(() => {
         getEvents();
-        
     }, []);
 
 
@@ -309,14 +305,16 @@ const Voter = () => {
 
     return (
         <div>
-            { (previousStatus != null ) && 
+            <Flex>
+                { (previousStatus != null ) && 
+                    <Heading as='h2' size='xl' mt="2rem">
+                        Previous Status was {nameWorkflowStatus[previousStatus]}
+                    </Heading>
+                }
                 <Heading as='h2' size='xl' mt="2rem">
-                    Previous Status was {nameWorkflowStatus[previousStatus]}
+                    Current Status is {nameWorkflowStatus[newStatus]}
                 </Heading>
-            }
-            <Heading as='h2' size='xl' mt="2rem">
-                Current Status is {nameWorkflowStatus[newStatus]}
-            </Heading>
+            </Flex>
 
 
             <Flex width="100%">
@@ -334,7 +332,7 @@ const Voter = () => {
             
             <Flex direction="column">
                 <Heading as='h2' size='xl' mt="2rem">
-                    Proposals added to the voting session (Events)
+                    Proposals added to the voting session (events)
                 </Heading>
                 <Flex mt="1rem" direction="column"></Flex>
                     { addProposalEvent.length > 0 ? addProposalEvent.map((event) => {
@@ -351,12 +349,12 @@ const Voter = () => {
 
 
             <Flex mt="1rem">
-                <Input  placeholder='Enter a valid specific proposal ID'onChange={e => setGetProposal(e.target.value)}/>
-                <Button colorScheme='whatsapp' onClick={() => getOneProposal()}>Get Proposal name from ID</Button>
+                <Input  placeholder='Enter a valid proposal ID'onChange={e => setGetProposal(e.target.value)}/>
+                <Button colorScheme='whatsapp' onClick={() => getOneProposal()}>Get Proposal name</Button>
             </Flex>
 
 
-            <Flex width="100%">
+            <Flex mt='1rem' width="100%">
                 <Flex direction="column" width="100%">
                     <Heading as='h2' size='xl'>
                         Choose the proposal that you want to vote for
@@ -372,25 +370,22 @@ const Voter = () => {
 
             <Flex direction="column">
                 <Heading as='h2' size='xl' mt="2rem" direction="column">
-                    Vote logs : display the voted proposal of a specific voter address
+                    Vote Logs : display the voted proposal of a specific voter address (events)
                 </Heading>
                 <Flex mt="1rem" direction="column">
                     {voterEvent.length > 0 && votedProposalIDEvent.length > 0 ? (
                         <React.Fragment>
-                            {voterEvent.map((addr) => (
-                                <Flex key={uuidv4()}>
-                                    <Text>
-                                        Voter {addr.voterEvent} voted proposal ID number
-                                    </Text>
-                                </Flex>
-                            ))}
-                            {votedProposalIDEvent.map((id) => (
-                                <Flex key={uuidv4()}>
-                                    <Text>
-                                        Voted proposal ID number {id.votedProposalIDEvent}
-                                    </Text>
-                                </Flex>
-                            ))}
+                            {voterEvent.map((addr, index) => {
+                                const voter = addr.voterEvent;
+                                const proposalID = votedProposalIDEvent[index].votedProposalIDEvent;
+                                return (
+                                    <React.Fragment key={uuidv4()}>
+                                        <Text key={uuidv4()}>
+                                            Voter {voter} voted proposal ID number {proposalID}
+                                        </Text>
+                                    </React.Fragment>
+                                );
+                            })}
                         </React.Fragment>
                     ) : (
                         <Text>No Vote completed at this stage</Text>
@@ -399,21 +394,19 @@ const Voter = () => {
             </Flex>
 
 
-            <Flex width="100%">
+            <Flex mt='1rem' mb='1rem' width="100%">
                 <Flex direction="column" width="100%">
                     <Button colorScheme='whatsapp' onClick={() => getWinningProposalId()}>Get the Winning Proposal ID</Button>
-                    <Heading as='h2' size='xl'>
+                    <Heading mt='1rem' as='h2' size='xl'>
                         The Voting Session has now ended and the Winning Proposal ID is {winningProposalId}
                     </Heading>
                 </Flex>
             </Flex>
 
             <Flex mt="1rem">
-                <Input  placeholder='Enter a valid specific proposal ID'onChange={e => setGetProposal(e.target.value)}/>
-                <Button colorScheme='whatsapp' onClick={() => getOneProposalVoteCount()}>Get Proposal vote count from ID</Button>
+                <Input  placeholder='Enter a valid proposal ID'onChange={e => setGetProposal(e.target.value)}/>
+                <Button colorScheme='whatsapp' onClick={() => getOneProposalVoteCount()}>Get Proposal vote count</Button>
             </Flex>
-
-
 
 
         </div>

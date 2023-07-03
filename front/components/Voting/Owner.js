@@ -10,7 +10,6 @@ import { Heading, Flex, Text, Input, Button, useToast } from '@chakra-ui/react'
 
 // CONTRACT
 import Contract from '../../public/artifacts/contracts/Voting.sol/Voting.json'
-import Ownable from '../../public/artifacts/@openzeppelin/contracts/access/Ownable.sol/Ownable.json'
 import { ethers } from "ethers"
 
 // WAGMI
@@ -295,11 +294,11 @@ const Owner = () => {
                     Previous Status was {nameWorkflowStatus[previousStatus]}
                 </Heading>
             }
-            <Heading as='h2' size='xl' mt="2rem">
+            <Heading as='h2' size='xl' mt="1rem">
                 Current Status is {nameWorkflowStatus[newStatus]}
             </Heading>
             
-            <Flex width="100%">
+            <Flex mt='2rem' width="100%">
             {isConnected ? (
                 <Flex direction="column" width="100%">
                     <Heading as='h2' size='xl'>
@@ -321,7 +320,7 @@ const Owner = () => {
                 Whitelisted Voter Addresses (Events)
             </Heading>
 
-            <Flex mt="1rem" direction="column"></Flex>
+            <Flex direction="column"></Flex>
                 { whitelistEvent.length > 0 ? whitelistEvent.map((event) => {
                     return <Flex key={uuidv4()}>
                             <Text>

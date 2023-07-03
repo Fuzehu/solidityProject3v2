@@ -10,7 +10,8 @@ import React, { useState, useEffect } from 'react'
 import { Heading, Flex } from '@chakra-ui/react'
 
 // WAGMI
-import { useAccount } from 'wagmi'
+import { prepareWriteContract, prepareReadContract, writeContract, readContract } from '@wagmi/core';
+import { useAccount } from 'wagmi';
 
 // CONTRACT
 import Contract from '../../public/artifacts/contracts/Voting.sol/Voting.json'
@@ -20,6 +21,7 @@ const Body = () => {
 
     // STATES
     const [isOwner, setIsOwner] = useState(null)
+    const [voterAddr, setVoterAddr] = useState('')
     const [isVoter, setIsVoter] = useState(null)
 
     // CONTRACT ADDRESS
@@ -39,7 +41,7 @@ const Body = () => {
 
         if (isConnected) {
             getOwner()
-        }
+        } 
     }, [isConnected]);
 
     return (
@@ -52,7 +54,7 @@ const Body = () => {
                                 "Loading..."
                             ) : isOwner ? (
                                 <Owner />
-                            ) : (
+                            ) : ( 
                                 <>
                                     <Voter />
                                     <NonRegisteredVoter />

@@ -6,7 +6,6 @@ import { Heading, Flex, Text, Input, Button, useToast } from '@chakra-ui/react'
 
 // CONTRACT
 import Contract from '../../public/artifacts/contracts/Voting.sol/Voting.json'
-import Ownable from '../../public/artifacts/@openzeppelin/contracts/access/Ownable.sol/Ownable.json'
 
 //import { ethers } from "ethers"
 
@@ -20,7 +19,7 @@ const NonRegisteredVoter = () => {
 
     return (
         <div>
-      
+            {/*You are not authorized to take part to the voting session*/}
         </div>
     )
 }
