@@ -154,7 +154,7 @@ const Voter = () => {
             title: 'Success !',
             description: `Your vote for the Proposal ID ${vote} has been successfully registered`,
             status: 'success',
-            duration: 3000,
+            duration: 5000,
             isClosable: true,
         });
         } catch (err) {
@@ -189,7 +189,7 @@ const Voter = () => {
         toast({
             title: `The winning proposal ID is : ${winningProposalId}`,
             status: 'success',
-            duration: 3000,
+            duration: 5000,
             isClosable: true,
         });
         } catch (err) {
@@ -319,20 +319,6 @@ const Voter = () => {
                 </Heading>
             </Flex>
 
-
-            <Flex mt='1rem' width="100%">
-                <Flex direction="column" width="100%">
-                    <Heading as='h2' size='xl'>
-                        Add a proposal to the voting session
-                    </Heading>
-                    <Flex mt="1rem">
-                        <Input  placeholder='Enter the proposal you want to submit to the voting session'onChange={e => setAddProposal(e.target.value)}/>
-                        <Button colorScheme='whatsapp' onClick={() => Proposal()}>Register Proposal</Button>
-                    </Flex>
-                </Flex>
-            </Flex>
-
-            
             <Flex direction="column">
                 <Heading as='h2' size='xl' mt="2rem">
                     Proposals added to the voting session (events)
@@ -349,27 +335,6 @@ const Voter = () => {
                     )}
                 <Flex />
             </Flex>
-
-
-            <Flex mt="1rem">
-                <Input  placeholder='Enter a valid proposal ID'onChange={e => setGetProposal(e.target.value)}/>
-                <Button colorScheme='whatsapp' onClick={() => getOneProposal()}>Get Proposal name</Button>
-            </Flex>
-
-
-            <Flex mt='1rem' width="100%">
-                <Flex direction="column" width="100%">
-                    <Heading as='h2' size='xl'>
-                        Choose the proposal that you want to vote for
-                    </Heading>
-                    <Flex mt="1rem">
-                        <Input  placeholder='Enter the proposal ID of your choice'onChange={e => setVote(e.target.value)}/>
-                        <Button colorScheme='whatsapp' onClick={() => Vote()}>Vote</Button>
-            
-                    </Flex>
-                </Flex>
-            </Flex>
-
 
             <Flex direction="column">
                 <Heading as='h2' size='xl' mt="2rem" direction="column">
@@ -396,22 +361,57 @@ const Voter = () => {
                 </Flex>
             </Flex>
 
-
-            <Flex mt='1rem' mb='1rem' width="100%">
-                <Flex direction="column" width="100%">
-                    <Button colorScheme='whatsapp' onClick={() => getWinningProposalId()}>Get the Winning Proposal ID</Button>
-                    <Heading mt='1rem' as='h2' size='xl'>
-                        The Voting Session has now ended and the Winning Proposal ID is {winningProposalId}
-                    </Heading>
-                </Flex>
-            </Flex>
-
             <Flex mt="1rem">
                 <Input  placeholder='Enter a valid proposal ID'onChange={e => setGetProposal(e.target.value)}/>
-                <Button colorScheme='whatsapp' onClick={() => getOneProposalVoteCount()}>Get Proposal vote count</Button>
+                <Button colorScheme='whatsapp' onClick={() => getOneProposal()}>Get Proposal name</Button>
             </Flex>
 
+            { newStatus == 1 && <>
+                                    <Flex mt='1rem' width="100%">
+                                        <Flex direction="column" width="100%">
+                                            <Heading as='h2' size='xl'>
+                                                Add a proposal to the voting session
+                                            </Heading>
+                                            <Flex mt="1rem">
+                                                <Input  placeholder='Enter the proposal you want to submit to the voting session'onChange={e => setAddProposal(e.target.value)}/>
+                                                <Button colorScheme='whatsapp' onClick={() => Proposal()}>Register Proposal</Button>
+                                            </Flex>
+                                        </Flex>
+                                    </Flex>
+                                </>
+            }   
 
+            { newStatus == 3 && <>
+                                    <Flex mt='1rem' width="100%">
+                                        <Flex direction="column" width="100%">
+                                            <Heading as='h2' size='xl'>
+                                                Choose the proposal that you want to vote for
+                                            </Heading>
+                                            <Flex mt="1rem">
+                                                <Input  placeholder='Enter the proposal ID of your choice'onChange={e => setVote(e.target.value)}/>
+                                                <Button colorScheme='whatsapp' onClick={() => Vote()}>Vote</Button>
+                                            </Flex>
+                                        </Flex>
+                                    </Flex>
+                                </>
+            }
+
+            { newStatus == 4 && <>
+                                    <Flex mt='1rem' mb='1rem' width="100%">
+                                        <Flex direction="column" width="100%">
+                                            <Button colorScheme='whatsapp' onClick={() => getWinningProposalId()}>Get the Winning Proposal ID</Button>
+                                            <Heading mt='1rem' as='h2' size='xl'>
+                                                The Voting Session has now ended and the Winning Proposal has the ID number {winningProposalId}
+                                            </Heading>
+                                        </Flex>
+                                    </Flex>
+
+                                    <Flex mt="1rem">
+                                        <Input  placeholder='Enter a valid proposal ID'onChange={e => setGetProposal(e.target.value)}/>
+                                        <Button colorScheme='whatsapp' onClick={() => getOneProposalVoteCount()}>Get Proposal vote count</Button>
+                                    </Flex>
+                                </>
+            }
         </div>
     );
 };

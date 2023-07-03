@@ -82,7 +82,7 @@ const Owner = () => {
                 title: 'Success !',
                 description: `${addVoter} has been successfully added to the voting whitelist`,
                 status: 'success',
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
             })
         } catch (err) {
@@ -114,7 +114,7 @@ const Owner = () => {
                 title: 'Success !',
                 description: `Proposals Registration Started`,
                 status: 'success',
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
             })
         } catch (err) {
@@ -146,7 +146,7 @@ const Owner = () => {
                 title: 'Success !',
                 description: `Proposals Registration Session Ended`,
                 status: 'success',
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
             })
         } catch (err) {
@@ -178,7 +178,7 @@ const Owner = () => {
                 title: 'Success !',
                 description: `Voting Session Started`,
                 status: 'success',
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
             })
         } catch (err) {
@@ -210,7 +210,7 @@ const Owner = () => {
                 title: 'Success !',
                 description: `Voting Session Ended, Votes are Tallied`,
                 status: 'success',
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
             })
         } catch (err) {
@@ -242,7 +242,7 @@ const Owner = () => {
             title: 'Success !',
             description: `The winning proposal ID is ${winningProposalId}`,
             status: 'success',
-            duration: 3000,
+            duration: 5000,
             isClosable: true,
         });
         } catch (err) {
@@ -318,41 +318,71 @@ const Owner = () => {
                     Current Status is {nameWorkflowStatus[newStatus]}
                 </Heading>
             </Flex>
-            
-            <Flex mt='2rem' width="100%">
-                <Flex direction="column" width="100%">
-                    <Heading as='h2' size='xl'>
-                        Add a voter address to the voting whitelist
-                    </Heading>
-                    <Flex mt="1rem">
-                        <Input  placeholder='Enter address to whitelist'onChange={e => setAddVoter(e.target.value)}/>
-                        <Button colorScheme='whatsapp' onClick={() => whitelist()}>Register Voter</Button>
-                    </Flex>
+
+
+            <Flex mt="2rem" direction="column">
+                <Heading as='h2' size='xl'>
+                    Whitelisted Voter Addresses (Events)
+                </Heading>
+                <Flex direction="column">
+                    { whitelistEvent.length > 0 ? whitelistEvent.map((event) => {
+                        return <Flex key={uuidv4()}>
+                                <Text>
+                                    {event.address}
+                                </Text>
+                            </Flex>
+                    }) : (
+                        <Text>No Address Whitelisted to this stage</Text>
+                    )}
                 </Flex>
             </Flex>
-
-            <Heading as='h2' size='xl' mt="2rem">
-                Whitelisted Voter Addresses (Events)
-            </Heading>
-
-            <Flex direction="column"></Flex>
-                { whitelistEvent.length > 0 ? whitelistEvent.map((event) => {
-                    return <Flex key={uuidv4()}>
-                            <Text>
-                                {event.address}
-                            </Text>
-                        </Flex>
-                }) : (
-                    <Text>No Address Whitelisted to this stage</Text>
-                )}
-            <Flex />
-
-            { newStatus == 0 && <>
-                                    <Heading as='h2' size='xl' mt="2rem">
-                                        2nd Workflow Status - Voters can suggest Proposals for the voting session
+            
+            
+            <Flex mt='2rem'direction="column">
+                                    <Heading as='h2' size='xl' mt="2rem" direction="column">
+                                        Vote Logs : display the voted proposal of a specific voter address (events)
                                     </Heading>
-                                    <Flex mt="1rem">
-                                        <Button colorScheme='whatsapp' onClick={() => startProposalsRegistering()}>Start Proposals Registering</Button>
+                                    <Flex direction="column">
+                                        {voterEvent.length > 0 && votedProposalIDEvent.length > 0 ? (
+                                            <React.Fragment>
+                                                {voterEvent.map((addr, index) => {
+                                                    const voter = addr.voterEvent;
+                                                    const proposalID = votedProposalIDEvent[index].votedProposalIDEvent;
+                                                    return (
+                                                        <React.Fragment key={uuidv4()}>
+                                                            <Text key={uuidv4()}>
+                                                                Voter {voter} voted proposal ID number {proposalID}
+                                                            </Text>
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </React.Fragment>
+                                        ) : (
+                                            <Text>No Vote completed at this stage</Text>
+                                        )}
+                                    </Flex>
+                                </Flex>
+
+            { newStatus == 0 && <>      
+                                    <Flex mt='2rem' width="100%">
+                                        <Flex direction="column" width="100%">
+                                            <Heading as='h2' size='xl'>
+                                                Add a voter address to the voting whitelist
+                                            </Heading>
+                                            <Flex mt="1rem">
+                                                <Input  placeholder='Enter address to whitelist'onChange={e => setAddVoter(e.target.value)}/>
+                                                <Button colorScheme='whatsapp' onClick={() => whitelist()}>Register Voter</Button>
+                                            </Flex>
+                                        </Flex>
+                                    </Flex>
+
+                                    <Flex>
+                                        <Heading as='h2' size='xl' mt="2rem">
+                                            2nd Workflow Status - Voters can suggest Proposals for the voting session
+                                        </Heading>
+                                        <Flex mt="1rem">
+                                            <Button colorScheme='whatsapp' onClick={() => startProposalsRegistering()}>Start Proposals Registering</Button>
+                                        </Flex>
                                     </Flex>
                                 </>
             }           
@@ -387,40 +417,18 @@ const Owner = () => {
                                 </>
             }   
 
-                                <Flex mt='2rem'direction="column">
-                                    <Heading as='h2' size='xl' mt="2rem" direction="column">
-                                        Vote Logs : display the voted proposal of a specific voter address (events)
-                                    </Heading>
-                                    <Flex mt="1rem" direction="column">
-                                        {voterEvent.length > 0 && votedProposalIDEvent.length > 0 ? (
-                                            <React.Fragment>
-                                                {voterEvent.map((addr, index) => {
-                                                    const voter = addr.voterEvent;
-                                                    const proposalID = votedProposalIDEvent[index].votedProposalIDEvent;
-                                                    return (
-                                                        <React.Fragment key={uuidv4()}>
-                                                            <Text key={uuidv4()}>
-                                                                Voter {voter} voted proposal ID number {proposalID}
-                                                            </Text>
-                                                        </React.Fragment>
-                                                    );
-                                                })}
-                                            </React.Fragment>
-                                        ) : (
-                                            <Text>No Vote completed at this stage</Text>
-                                        )}
+            { newStatus == 4 && <>
+                                    <Flex mt='2rem' width="100%">
+                                        <Flex direction="column" width="100%">
+                                            <Button colorScheme='whatsapp' onClick={() => getWinningProposalId()}>Get the Winning Proposal ID</Button>
+                                            <Heading as='h2' size='xl'>
+                                                The Voting Session has now ended and the Winning Proposal has the ID number {winningProposalId}
+                                            </Heading>
+                                        </Flex>
                                     </Flex>
-                                </Flex>
+                                </>
+            }
 
-
-                                <Flex mt='2rem' width="100%">
-                                    <Flex direction="column" width="100%">
-                                        <Button colorScheme='whatsapp' onClick={() => getWinningProposalId()}>Get the Winning Proposal ID</Button>
-                                        <Heading as='h2' size='xl'>
-                                            The Voting Session has now ended and the Winning Proposal has the ID number {winningProposalId}
-                                        </Heading>
-                                    </Flex>
-                                </Flex>
         </div>
     )
 }
