@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPublicClient, http, parseAbiItem } from 'viem';
 import { hardhat } from 'viem/chains';
+import Header from '../Header/Header';
 
 // RANDOMIZER
 import { v4 as uuidv4 } from 'uuid';
@@ -305,19 +306,21 @@ const Voter = () => {
 
     return (
         <div>
-            <Flex>
+            <Flex direction="column" width="100%">
+                <Flex>
                 { (previousStatus != null ) && 
                     <Heading as='h2' size='xl' mt="2rem">
                         Previous Status was {nameWorkflowStatus[previousStatus]}
                     </Heading>
                 }
-                <Heading as='h2' size='xl' mt="2rem">
+                </Flex>
+                <Heading as='h2' size='xl'>
                     Current Status is {nameWorkflowStatus[newStatus]}
                 </Heading>
             </Flex>
 
 
-            <Flex width="100%">
+            <Flex mt='1rem' width="100%">
                 <Flex direction="column" width="100%">
                     <Heading as='h2' size='xl'>
                         Add a proposal to the voting session

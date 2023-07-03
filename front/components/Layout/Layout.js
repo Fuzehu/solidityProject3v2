@@ -8,7 +8,6 @@ const Layout = () => {
   return (
     <Flex
       direction="column"
-      h="100vh"
       justifyContent="center"
     >
         <Header />

@@ -37,9 +37,16 @@ const Owner = () => {
 
     // STATES
     const [addVoter, setAddVoter] = useState(null)
+
     const [whitelistEvent, setWhitelistEvent] = useState([])
+
     const [previousStatus, setPreviousStatus] = useState(null)
     const [newStatus, setNewStatus] = useState(0)
+
+    const [vote, setVote] = useState(0);
+    const [voterEvent, setVoterEvent] = useState([]);
+    const [votedProposalIDEvent, setVotedProposalIDEvent] = useState([]);
+
     const [winningProposalId, setWinningProposalId] = useState([]);
 
     
@@ -277,11 +284,21 @@ const Owner = () => {
         } catch {}
     }
 
-
+    // GET VOTED EVENT
+    const getVotedLogs = async () => {
+        const votedLogs = await client.getLogs({
+            event: parseAbiItem('event Voted(address voterEvent, uint votedProposalIDEvent)'),
+            fromBlock: 0n,
+            toBlock: 'latest',
+        });
+        setVoterEvent(votedLogs.map(log => ({voterEvent: log.args.voterEvent})));
+        setVotedProposalIDEvent(votedLogs.map(log => ({votedProposalIDEvent: log.args.votedProposalIDEvent.toString()})));
+    };
 
     useEffect(() => {
         getWhitelistLogs()
         getWorkflowStatusLogs()
+        getVotedLogs()
     }, []);
 
 
@@ -289,17 +306,20 @@ const Owner = () => {
 
     return (
         <div>
-            { (previousStatus != null ) && 
-                <Heading as='h2' size='xl' mt="2rem">
-                    Previous Status was {nameWorkflowStatus[previousStatus]}
+            <Flex direction="column" width="100%">
+                <Flex>
+                { (previousStatus != null ) && 
+                    <Heading as='h2' size='xl' mt="2rem">
+                        Previous Status was {nameWorkflowStatus[previousStatus]}
+                    </Heading>
+                }
+                </Flex>
+                <Heading as='h2' size='xl' mt="1rem">
+                    Current Status is {nameWorkflowStatus[newStatus]}
                 </Heading>
-            }
-            <Heading as='h2' size='xl' mt="1rem">
-                Current Status is {nameWorkflowStatus[newStatus]}
-            </Heading>
+            </Flex>
             
             <Flex mt='2rem' width="100%">
-            {isConnected ? (
                 <Flex direction="column" width="100%">
                     <Heading as='h2' size='xl'>
                         Add a voter address to the voting whitelist
@@ -308,12 +328,7 @@ const Owner = () => {
                         <Input  placeholder='Enter address to whitelist'onChange={e => setAddVoter(e.target.value)}/>
                         <Button colorScheme='whatsapp' onClick={() => whitelist()}>Register Voter</Button>
                     </Flex>
-            </Flex>
-            ) : (
-                <Flex p="2rem" justifyContent="center" alignItems="center" width="100%">
-                    <Text>Please connect your Wallet</Text>
                 </Flex>
-            )}  
             </Flex>
 
             <Heading as='h2' size='xl' mt="2rem">
@@ -344,7 +359,7 @@ const Owner = () => {
                         
             { newStatus == 1 && <>
                                     <Heading as='h2' size='xl' mt="2rem">
-                                        3rd Workflow Status - Voters can suggest Proposals for the voting session
+                                        3rd Workflow Status - End the Proposals Registration for the voting session
                                     </Heading>
                                     <Flex mt="1rem">
                                         <Button colorScheme='whatsapp' onClick={() => endProposalsRegistering()}>End Proposals Registering</Button>
@@ -372,8 +387,33 @@ const Owner = () => {
                                 </>
             }   
 
+                                <Flex mt='2rem'direction="column">
+                                    <Heading as='h2' size='xl' mt="2rem" direction="column">
+                                        Vote Logs : display the voted proposal of a specific voter address (events)
+                                    </Heading>
+                                    <Flex mt="1rem" direction="column">
+                                        {voterEvent.length > 0 && votedProposalIDEvent.length > 0 ? (
+                                            <React.Fragment>
+                                                {voterEvent.map((addr, index) => {
+                                                    const voter = addr.voterEvent;
+                                                    const proposalID = votedProposalIDEvent[index].votedProposalIDEvent;
+                                                    return (
+                                                        <React.Fragment key={uuidv4()}>
+                                                            <Text key={uuidv4()}>
+                                                                Voter {voter} voted proposal ID number {proposalID}
+                                                            </Text>
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </React.Fragment>
+                                        ) : (
+                                            <Text>No Vote completed at this stage</Text>
+                                        )}
+                                    </Flex>
+                                </Flex>
 
-                                <Flex width="100%">
+
+                                <Flex mt='2rem' width="100%">
                                     <Flex direction="column" width="100%">
                                         <Button colorScheme='whatsapp' onClick={() => getWinningProposalId()}>Get the Winning Proposal ID</Button>
                                         <Heading as='h2' size='xl'>

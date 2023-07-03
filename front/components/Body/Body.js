@@ -33,7 +33,7 @@ const Body = () => {
 
     useEffect(() => {
         async function getOwner() {
-            const provider = new JsonRpcProvider("http://localhost:8545");
+            const provider = new JsonRpcProvider(/*"http://localhost:8545"*/);
             const contract = new ethers.Contract(contractAddress, Contract.abi, provider);
             const owner = await contract.owner();
             setIsOwner(owner === address)
@@ -57,7 +57,7 @@ const Body = () => {
                             ) : ( 
                                 <>
                                     <Voter />
-                                    <NonRegisteredVoter />
+                                    {/*<NonRegisteredVoter />*/}
                                 </>
                             )}
                         </Heading>
