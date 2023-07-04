@@ -15,7 +15,7 @@ async function main() {
   console.log(`Voting deployed to ${voting.address}`);
 }
 
-main().catch((error) => {
+/*main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
-});
+});*/

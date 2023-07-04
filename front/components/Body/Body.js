@@ -38,7 +38,7 @@ const Body = () => {
             const owner = await contract.owner();
             setIsOwner(owner === address)
         }
-
+        console.log(address)
         if (isConnected) {
             getOwner()
         } 
